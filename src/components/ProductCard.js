@@ -1,7 +1,10 @@
 import React from "react";
 import { BiListPlus } from "react-icons/bi";
+import { useDispatch } from "react-redux";
+import { addToCart, removeFromCart } from "../features/cart/cartSlice";
 
 const ProductCard = ({ product, isInCart }) => {
+  const dispatch = useDispatch();
   return (
     <div
       className='shadow-lg rounded-3xl border relative  p-3 flex flex-col text-indigo-900'
@@ -10,7 +13,7 @@ const ProductCard = ({ product, isInCart }) => {
       {isInCart && (
         <div className="flex justify-between">
           <div>
-            <h3>{`Added on: ${product.dateTime.toLocaleString("en-US")}`}</h3>
+            <h3>{`Added on: ${product.dateTime?.toLocaleString("en-US")}`}</h3>
           </div>
           <div 
             className="bg-indigo-500 text-white rounded-md px-2"> 
@@ -35,6 +38,7 @@ const ProductCard = ({ product, isInCart }) => {
             <div className='flex justify-between items-center gap-2 '>
               <button 
                 className={`${product.quantity === 1? "bg-red-500": "bg-indigo-500"} text-lg text-white rounded h-10 w-10`}
+                onClick={() => dispatch(removeFromCart(product))}
               >
                 -
               </button>
@@ -45,6 +49,7 @@ const ProductCard = ({ product, isInCart }) => {
               </div>
               <button 
                 className='bg-indigo-500 text-lg text-white rounded h-10 w-10'
+                onClick={() => dispatch(addToCart(product))}
               >
                 +
               </button>
@@ -54,6 +59,7 @@ const ProductCard = ({ product, isInCart }) => {
           <div className='flex gap-2'>
             <button 
               className='bg-indigo-500 rounded-full py-1 px-2 flex-1 text-white text-bold'
+              onClick={() => dispatch(addToCart(product))}
             >
               Add to cart
             </button>
