@@ -11,10 +11,7 @@ const ProductCard = ({ product, isInCart }) => {
       key={product._id}
     >
       {isInCart && (
-        <div className="flex justify-between">
-          <div>
-            <h3>{`Added on: ${product.dateTime?.toLocaleString("en-US")}`}</h3>
-          </div>
+        <div className="flex justify-end">
           <div 
             className="bg-indigo-500 text-white rounded-md px-2"> 
             {product.quantity}
