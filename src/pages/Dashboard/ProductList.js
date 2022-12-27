@@ -1,16 +1,19 @@
 import React from "react";
 import { useEffect } from "react";
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getProducts } from "../../features/products/productsSlice";
 
 const ProductList = () => {
-  const [products, setProducts] = useState([]);
+  const { products , isLoading } = useSelector(state => state.products);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    fetch('http://localhost:5000/products')
-      .then(res => res.json())
-      .then(data => setProducts(data.data))
-  }, [])
+    dispatch(getProducts())
+  }, [dispatch])
 
+  if(isLoading) {
+    return <p className="mt-32 text-center">Loading...</p>
+  }
 
   return (
     <div class='flex flex-col justify-center items-center h-full w-full '>

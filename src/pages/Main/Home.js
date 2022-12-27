@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ProductCard from "../../components/ProductCard";
 import { toggleBrand, toggleStock } from "../../features/filter/filterSlice";
+import { getProducts } from "../../features/products/productsSlice";
 
 const Home = () => {
-  const [products, setProducts] = useState([]);
+  // const [products, setProducts] = useState([]);
+  const { products , isLoading, isError, error } = useSelector(state => state.products)
   const filter = useSelector(state => state.filter)
   const {inStock, filters: { brands }} = filter;
   const dispatch = useDispatch();
   let filteredProducts = [];
 
   useEffect(() => {
-    fetch('http://localhost:5000/products')
-      .then(res => res.json())
-      .then(data => setProducts(data.data))
-  }, [])
+    dispatch(getProducts())
+  }, [dispatch])
 
   //Product filtering logics
   const getStockFiltered = (items) => items.filter(p => p.status);
@@ -35,6 +35,14 @@ const Home = () => {
   }
 
   const activeClass = "text-white  bg-indigo-500 border-white";
+
+  if(isLoading) {
+    return <p className="mt-32 text-center">Loading...</p>
+  }
+
+  if(isError) {
+    return <p className="mt-32 text-center">{error}</p>
+  }
 
   return (
     <div className="max-w-7xl gap-14 mx-auto my-10">
