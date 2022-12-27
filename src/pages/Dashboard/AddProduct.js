@@ -1,14 +1,21 @@
 import React from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { addProduct, resetPostSuccess } from "../../features/products/productsSlice";
 
 const AddProduct = () => {
   const { register, handleSubmit } = useForm();
+  const { postSuccess, isLoading } = useSelector(state => state.products)
+  const dispatch = useDispatch();
 
   const submit = (data) => {
     const product = {
       model: data.model,
       brand: data.brand,
       status: data.status === "true" ? true : false,
+      image: data.image,
       price: data.price,
       keyFeature: [
         data.keyFeature1,
@@ -20,7 +27,15 @@ const AddProduct = () => {
     };
 
     console.log(product);
+    dispatch(addProduct(product))
   };
+
+  useEffect(() => {
+    if(!isLoading && postSuccess) {
+      toast.success("Product added successfully");
+      dispatch(resetPostSuccess());
+    }
+  }, [dispatch, postSuccess, isLoading])
 
   return (
     <div className='flex justify-center items-center h-full '>
@@ -52,9 +67,9 @@ const AddProduct = () => {
         </div>
         <div className='flex flex-col w-full max-w-xs'>
           <label className='mb-2' htmlFor='price'>
-            Image
+            Price
           </label>
-          <input type='text' name='price' id='price' {...register("price")} />
+          <input type='number' name='price' id='price' {...register("price")} />
         </div>
 
         <div className='flex flex-col w-full max-w-xs'>
