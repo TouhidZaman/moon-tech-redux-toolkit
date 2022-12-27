@@ -1,19 +1,28 @@
 import React from "react";
 import { useEffect } from "react";
+import { toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { getProducts } from "../../features/products/productsSlice";
+import { getProducts, removeProduct, resetDeleteSuccess } from "../../features/products/productsSlice";
 
 const ProductList = () => {
-  const { products , isLoading } = useSelector(state => state.products);
+  const { products , isLoading, deleteSuccess } = useSelector(state => state.products);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getProducts())
   }, [dispatch])
 
+  useEffect(() => {
+    if(!isLoading && deleteSuccess) {
+      toast.success("Product deleted successfully")
+      dispatch(resetDeleteSuccess())
+    }
+  }, [isLoading, deleteSuccess, dispatch])
+
   if(isLoading) {
     return <p className="mt-32 text-center">Loading...</p>
   }
+
 
   return (
     <div className='flex flex-col justify-center items-center h-full w-full '>
@@ -22,11 +31,10 @@ const ProductList = () => {
           <div className='font-semibold text-gray-800'>Products</div>
         </header>
 
-        <div className='overflow-x-auto p-3'>
-          <table className='table-auto w-full'>
+        <div className='overflow-x-auto p-8'>
+          <table className='table-auto w-full '>
             <thead className='text-xs font-semibold uppercase text-gray-400 bg-gray-50'>
               <tr>
-                <th></th>
                 <th className='p-2'>
                   <div className='font-semibold text-left'>Product Name</div>
                 </th>
@@ -49,9 +57,6 @@ const ProductList = () => {
               {products.map(({ model, brand, price, status, _id }) => (
                 <tr key={_id}>
                   <td className='p-2'>
-                    <input type='checkbox' className='w-5 h-5' value='id-1' />
-                  </td>
-                  <td className='p-2'>
                     <div className='font-medium text-gray-800'>{model}</div>
                   </td>
                   <td className='p-2'>
@@ -73,7 +78,9 @@ const ProductList = () => {
                   </td>
                   <td className='p-2'>
                     <div className='flex justify-center'>
-                      <button>
+                      <button
+                      onClick={()=> dispatch(removeProduct(_id))}
+                      >
                         <svg
                           className='w-8 h-8 hover:text-blue-600 rounded-full hover:bg-gray-100 p-1'
                           fill='none'

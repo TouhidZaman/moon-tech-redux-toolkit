@@ -1,11 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import { fetchProducts, postProduct } from "./productsAPI"
+import { deleteProduct, fetchProducts, postProduct } from "./productsAPI"
 
 const initialState = {
     products: [],
     isLoading: false,
     isError: false,
     postSuccess: false,
+    deleteSuccess: false,
     error: "",
 }
 
@@ -19,12 +20,24 @@ export const addProduct = createAsyncThunk("products/addProduct", async (product
     return result;
 })
 
+export const removeProduct = createAsyncThunk("products/removeProduct", async (productId, productAPI) => {
+    const result = deleteProduct(productId);
+    productAPI.dispatch(deleteLocalProduct(productId))
+    return result;
+})
+
 const productsSlice = createSlice({
     name: "products",
     initialState,
     reducers: {
         resetPostSuccess: (state) => {
             state.postSuccess = false;
+        },
+        resetDeleteSuccess: (state) => {
+            state.deleteSuccess = false;
+        },
+        deleteLocalProduct: (state, action) => {
+            state.products = state.products.filter(product => product._id !== action.payload)
         }
     },
     extraReducers: (builder) => {
@@ -59,9 +72,24 @@ const productsSlice = createSlice({
                 state.isError = true;
                 state.error = action.error.message
             })
+            .addCase(removeProduct.pending, (state) => {
+                state.isLoading=true;
+                state.isError=false;
+            })
+            .addCase(removeProduct.fulfilled, (state) => {
+                state.deleteSuccess = true;
+                state.isLoading = false;
+                state.isError = false;
+            })
+            .addCase(removeProduct.rejected, (state, action) => {
+                state.deleteSuccess = false;
+                state.isLoading = false;
+                state.isError = true;
+                state.error = action.error.message
+            })
     }
 })
 
-export const { resetPostSuccess } = productsSlice.actions;
+export const { resetPostSuccess, resetDeleteSuccess, deleteLocalProduct } = productsSlice.actions;
 
 export default productsSlice.reducer;
